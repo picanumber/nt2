@@ -37,7 +37,6 @@
 
 #define BOOST_DISPATCH_CLOSE_(s,data,elem) }
 #define BOOST_DISPATCH_CLOSE(seq) BOOST_PP_SEQ_FOR_EACH(BOOST_DISPATCH_CLOSE_, ~, seq)
-
 #define BOOST_DISPATCH_REOPEN_(s,data,elem) namespace elem {
 #define BOOST_DISPATCH_REOPEN(seq) BOOST_PP_SEQ_FOR_EACH(BOOST_DISPATCH_REOPEN_, ~, seq)
 
@@ -64,9 +63,15 @@ namespace boost { namespace dispatch { namespace meta                          \
                          , Types                                               \
                          )                                                     \
           >                                                                    \
+<<<<<<< HEAD
   BOOST_DISPATCH_FORCE_INLINE                                                  \
   BOOST_DISPATCH_PP_STRIP(Ret)                                                 \
   dispatching( BOOST_DISPATCH_PP_STRIP(Tag), BOOST_DISPATCH_PP_STRIP(Site)     \
+=======
+  BOOST_FORCEINLINE                                                            \
+  BOOST_PP_REMOVE_PARENS(Ret)                                                  \
+  dispatching( BOOST_PP_REMOVE_PARENS(Tag), BOOST_PP_REMOVE_PARENS(Site)       \
+>>>>>>> 5c17152... Use Boost version of FORCEINLINE, NOINLINE and (UN)LIKELY
                BOOST_PP_REPEAT( BOOST_PP_SEQ_SIZE(Seq)                         \
                               , BOOST_DISPATCH_ARG                             \
                               , Seq                                            \
