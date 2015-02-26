@@ -63,15 +63,9 @@ namespace boost { namespace dispatch { namespace meta                          \
                          , Types                                               \
                          )                                                     \
           >                                                                    \
-<<<<<<< HEAD
-  BOOST_DISPATCH_FORCE_INLINE                                                  \
+  BOOST_FORCEINLINE                                                  \
   BOOST_DISPATCH_PP_STRIP(Ret)                                                 \
   dispatching( BOOST_DISPATCH_PP_STRIP(Tag), BOOST_DISPATCH_PP_STRIP(Site)     \
-=======
-  BOOST_FORCEINLINE                                                            \
-  BOOST_PP_REMOVE_PARENS(Ret)                                                  \
-  dispatching( BOOST_PP_REMOVE_PARENS(Tag), BOOST_PP_REMOVE_PARENS(Site)       \
->>>>>>> 5c17152... Use Boost version of FORCEINLINE, NOINLINE and (UN)LIKELY
                BOOST_PP_REPEAT( BOOST_PP_SEQ_SIZE(Seq)                         \
                               , BOOST_DISPATCH_ARG                             \
                               , Seq                                            \
@@ -109,7 +103,7 @@ namespace boost { namespace dispatch { namespace meta                          \
                          , Types                                               \
                          )                                                     \
           >                                                                    \
-  BOOST_DISPATCH_FORCE_INLINE                                                  \
+  BOOST_FORCEINLINE                                                  \
   BOOST_DISPATCH_PP_STRIP(Ret)                                                 \
   dispatching( BOOST_DISPATCH_PP_STRIP(Tag), BOOST_DISPATCH_PP_STRIP(Site)     \
                BOOST_PP_REPEAT( BOOST_PP_SEQ_SIZE(Seq)                         \
@@ -150,7 +144,7 @@ namespace boost { namespace dispatch { namespace meta                          \
                          , Types                                               \
                          )                                                     \
           >                                                                    \
-  BOOST_DISPATCH_FORCE_INLINE                                                  \
+  BOOST_FORCEINLINE                                                  \
   typename boost::enable_if< BOOST_DISPATCH_PP_STRIP(Cond)                     \
                            , BOOST_DISPATCH_PP_STRIP(Ret)                      \
                            >::type                                             \
@@ -194,7 +188,7 @@ namespace boost { namespace dispatch { namespace meta                          \
                          , Types                                               \
                          )                                                     \
           >                                                                    \
-  BOOST_DISPATCH_FORCE_INLINE                                                  \
+  BOOST_FORCEINLINE                                                  \
   typename boost::enable_if< BOOST_DISPATCH_PP_STRIP(Cond)                     \
                            , BOOST_DISPATCH_PP_STRIP(Ret)                      \
                            >::type                                             \
