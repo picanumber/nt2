@@ -41,9 +41,8 @@ namespace nt2
     template<std::size_t N>
     struct link_nodes
     {
-      template <class Future, typename Node_raw, typename Tuple>
-      static void call( Future & f
-                      , Node_raw c
+      template <typename Node_raw, typename Tuple>
+      static void call( Node_raw c
                       , Tuple && a
                       )
       {
@@ -51,24 +50,21 @@ namespace nt2
         tbb::flow::make_edge( *( std::get<N-1>(a).node_ )
                             , *c
                             );
-        f.attach_previous_future( std::get<N-1>(a) );
-        link_nodes<N-1>().call(f,c,a);
+        link_nodes<N-1>().call(c,a);
       }
     };
 
     template<>
     struct link_nodes<1ul>
     {
-      template <class Future, typename Node_raw, typename Tuple>
-      static void call( Future & f
-                      , Node_raw c
+      template <typename Node_raw, typename Tuple>
+      static void call( Node_raw c
                       , Tuple && a
                       )
       {
         tbb::flow::make_edge( *( std::get<0>(a).node_ )
                             , *c
                             );
-        f.attach_previous_future( std::get<0>(a) );
       }
     };
   }
@@ -85,18 +81,22 @@ namespace nt2
     template <typename Future>
     whenall_future static call( std::vector<Future> & lazy_values )
     {
-      whenall_future future_res;
+      details::tbb_task_wrapper< details::empty_functor, int >
+      packaged_task
+        ( (details::empty_functor()),
+          std::promise<int>()
+        );
+
+      whenall_future future_res( packaged_task.get_future() );
 
       node_type * c = new node_type( *(future_res.getWork()),
-        details::tbb_task_wrapper<details::empty_functor,whenall_future>
-        (details::empty_functor(), future_res)
-        );
+                                     std::move(packaged_task)
+                                   );
 
       future_res.getTaskQueue()->push_back(c);
 
       for (std::size_t i=0; i<lazy_values.size(); i++)
       {
-        future_res.attach_previous_future(lazy_values[i]);
         tbb::flow::make_edge(*(lazy_values[i].node_),*c);
       }
 
@@ -107,20 +107,22 @@ namespace nt2
     template< typename ... A >
     whenall_future static call( details::tbb_future<A> & ...a )
     {
-      whenall_future future_res;
-
-      node_type * c = new node_type( *future_res.getWork(),
-        details::tbb_task_wrapper<details::empty_functor,whenall_future>
-        ( details::empty_functor()
-          , whenall_future(future_res)
-          )
+      details::tbb_task_wrapper< details::empty_functor, int >
+      packaged_task
+        ( (details::empty_functor()),
+          std::promise<int>()
         );
+
+      whenall_future future_res (packaged_task.get_future());
+
+      node_type * c
+      = new node_type( *future_res.getWork(), std::move(packaged_task) );
 
       future_res.getTaskQueue()->push_back(c);
       future_res.attach_task(c);
 
       details::link_nodes< sizeof...(A) >()
-      .call(future_res,c,std::tie(a...));
+      .call(c,std::tie(a...));
 
       return future_res;
     }
