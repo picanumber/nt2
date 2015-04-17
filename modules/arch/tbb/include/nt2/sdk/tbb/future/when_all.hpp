@@ -21,6 +21,7 @@
 
 #include <cstdio>
 #include <tuple>
+#include <algorithm>
 
 namespace nt2
 {
@@ -64,11 +65,14 @@ namespace nt2
     typedef typename tbb::flow::continue_node<
     tbb::flow::continue_msg> node_type;
 
-    template <typename Future>
-    details::tbb_future< std::vector<Future> >
-    static call( std::vector<Future> & lazy_values )
+    template <typename T>
+    details::tbb_future< std::vector< details::tbb_shared_future<T> > >
+    static call( std::vector< details::tbb_future<T> > & lazy_values )
     {
-      typedef typename std::vector<Future> whenall_vector;
+      typedef typename std::vector<
+                         details::tbb_shared_future<T>
+                       > whenall_vector;
+
       typedef typename details::tbb_future< whenall_vector >
       whenall_future;
 
@@ -76,7 +80,18 @@ namespace nt2
         std::function< whenall_vector() >
       , whenall_vector
       >
-      packaged_task( [&](){ return lazy_values; } );
+      packaged_task(
+        [&](){
+          whenall_vector returned_lazy_values ( lazy_values.size() );
+
+          for(std::size_t i=0; i< lazy_values.size(); i++)
+          {
+            returned_lazy_values[i] = lazy_values[i].share();
+          }
+
+          return returned_lazy_values;
+        }
+      );
 
       whenall_future future_res( packaged_task.get_future() );
 
