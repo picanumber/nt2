@@ -54,7 +54,7 @@ namespace nt2
                               return f_( std::move(previous) );
                            }
                           , std::forward<F>(f)
-                          , shared_future(*this)
+                          , nt2_shared_future(*this)
                          );
       }
     };
